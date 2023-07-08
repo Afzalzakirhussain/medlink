@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import Cookies from 'universal-cookie';
 import Swal from 'sweetalert2';
 
-import signinImage from '../assets/signup.jpg';
-
 const cookies = new Cookies();
 
 const initialState = {
@@ -16,16 +14,21 @@ const initialState = {
 }
 
 const Auth = () => {
-    const [isSignup, setisSignup] = useState(false);
+    const [isSignIn, setIsSignIn] = useState(true);
     const [formData, setformData] = useState(initialState);
 
     const handleChange = (event) => {
         setformData({ ...formData, [event.target.name]: event.target.value })
     }
 
-    const switchMode = () => {
-        setisSignup((previsSignup) => !previsSignup);
+    const switchMode = (mode) => {
+        if (mode === 'signIn') {
+            setIsSignIn(true);
+        } else {
+            setIsSignIn(false);
+        }
     }
+
 
     const apicall = async (requestOptions, phoneNumber, avatharURL) => {
         try {
@@ -35,7 +38,7 @@ const Auth = () => {
             // https://medlinkbackend.onrender.com
 
             // fetch datas from db
-            const response = await fetch(`${URL}/${isSignup ? 'signup' : 'login'}`, requestOptions);
+            const response = await fetch(`${URL}/${isSignIn ? 'signup' : 'login'}`, requestOptions);
             const data = response.json();
             const { token, userId, fullName, userName, hashedPassword, message } = await data;
             if (message === 'INCORRECT_PASSWORD') {
@@ -65,9 +68,9 @@ const Auth = () => {
 
                 });
                 const createAccountLink = document.getElementById("createAccountLink");
-                createAccountLink.addEventListener("click", function (event) {
+                createAccountLink?.addEventListener("click", function (event) {
                     event.preventDefault();
-                    setisSignup((previsSignup) => !previsSignup);
+                    setIsSignIn((previsSignup) => !previsSignup);
                     Swal.close();
                 });
                 return;
@@ -80,7 +83,7 @@ const Auth = () => {
                 cookies.set('fullName', fullName);
                 cookies.set('userName', userName);
 
-                if (isSignup) {
+                if (isSignIn) {
                     cookies.set('phoneNumber', phoneNumber);
                     cookies.set('avatharURL', avatharURL);
                     cookies.set('hashedPassword', hashedPassword);
@@ -125,107 +128,107 @@ const Auth = () => {
         apicall(requestOptions, phoneNumber, avatharURL);
     };
 
-
     return (
         <>
             <div className="auth_wrapper_main">
                 {/* left */}
-                <div className="auth_wrapper_left_main">
-                    <img src="3.jpg" alt="" />
-                    <h3>Med<span>Link</span></h3>
-                    <div className="auth_wrapper_left_welcome_div">
-                        <div className="auth_wrapper_left_welcome_sub_div">
-                            <h2>Welcome to <b>MedLink</b> </h2>
-                            <p>Connect with your healthcare team in one place</p>
-                        </div>
-                    </div>
+                <div className="project_company_name">
+                    <span><p><b>M</b>ed<b style={{ color: "#1e6ffb" }}>Link</b></p></span>
                 </div>
+                <div className="auth_wrapper_left_main" ></div>
                 {/* right */}
-                <div className="auth_wrapper_right_main">
-                    <div className="auth_wrapper_right_mode_switch">
-                        <div className="auth_wrapper_right_mode_sign_in">
-                            <p>Sign in</p>
-                        </div>
-                        <div className="auth_wrapper_right_mode_create_account">
-                            <p>Create Account</p>
+                <div className="auth_wrapper_right_main_wrapper">
+                    <div className="auth_wrapper_right_main">
+                        <div className="auth_wrapper_right_mode_switch">
+                            <div onClick={() => switchMode("signIn")} className={`auth_wrapper_right_mode_sign_in  ${isSignIn ? "selected_border" : ""}`}>
+                                <p >Sign in</p>
+                            </div>
+                            <div onClick={() => switchMode("signUp")} className={`auth_wrapper_right_mode_create_account ${isSignIn ? "" : "selected_border"}`}>
+                                <p >Create Account</p>
                         </div>
                     </div>
-
-                    <p className='auth_wrapper_right_form_title'>Sign in to your account to continue.</p>
-
+                        <h6 className='auth_wrapper_right_form_title'>  {isSignIn ? `Sign in to your account to continue.` : `Sign up to your account to continue.`}</h6>
                     {/* form */}
                     <form onSubmit={handleSubmit}>
 
-                        <div className="auth_wrapper_right_form_input">
-                            <label htmlFor="userName">User name</label>
-                            <input
-                                type="text"
-                                name='userName'
-                                id='userName'
-                                placeholder='User name'
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        <div className="auth_wrapper_right_form_input">
-                            <label htmlFor="phoneNumber">Phone Number</label>
-                            <input
-                                type="text"
-                                name='phoneNumber'
-                                id='phoneNumber'
-                                placeholder='Phone Number'
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        <div className="auth_wrapper_right_form_input">
-                            <label htmlFor="avatharURL">Avathar URL</label>
-                            <input
-                                type="text"
-                                name='avatharURL'
-                                id='avatharURL'
-                                placeholder='Avathar URL'
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        <div className="auth_wrapper_right_form_input">
-                            <label htmlFor="password">Password</label>
-                            <input
-                                type="password"
-                                name='password'
-                                id='password'
-                                placeholder='Password'
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        <div className="auth_wrapper_right_form_input">
-                            <label htmlFor="confirmPassword" >Confirm Password</label>
-                            <input
-                                type="password"
-                                name='confirmPassword'
-                                id='confirmPassword'
-                                placeholder='Confirm Password'
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        <div className="auth_wrapper_right_form_button">
-                            <p>Sign in </p>
-                            <p>Create Account</p>
+                            <div className="auth_wrapper_right_form_input">
+                                <input type="text"
+                                    className='formAnimInput'
+                                    placeholder=' '
+                                    name='userName'
+                                    onChange={handleChange}
+                                    required
+                                    id='userName'
+                                />
+                                <label className='formLabel' htmlFor='userName'>User name</label>
+                            </div>
+                            {
+                                !isSignIn &&
+                                <div className="auth_wrapper_right_form_input">
+                                        <input type="text"
+                                            className='formAnimInput'
+                                            placeholder=' '
+                                            name='phoneNumber'
+                                            pattern="[0-9]*"
+                                            onChange={handleChange}
+                                            required
+                                            id='phoneNumber'
+                                        />
+                                        <label className='formLabel' htmlFor='phoneNumber'>Phone Number</label>
+                                    </div>
+                            }
+                            {
+                                !isSignIn &&
+                                <div className="auth_wrapper_right_form_input">
+                                        <input type="text"
+                                            className='formAnimInput'
+                                            placeholder=' '
+                                            name='avatharURL'
+                                            onChange={handleChange}
+                                            required
+                                            id='avatharUrl'
+                                        />
+                                        <label className='formLabel' htmlFor='avatharUrl'>Avathar URL</label>
+                                    </div>
+                            }
+                            <div className="auth_wrapper_right_form_input">
+                                <input
+                                    type="password"
+                                    className='formAnimInput'
+                                    placeholder=' '
+                                    name='password'
+                                    onChange={handleChange}
+                                    required
+                                    id='password'
+                                />
+                                <label className='formLabel' htmlFor='password'>Password</label>
+                            </div>
+                            {!isSignIn &&
+                                <div className="auth_wrapper_right_form_input">
+                                    <input
+                                        type="password"
+                                        className='formAnimInput'
+                                        placeholder=' '
+                                        name='confirmPassword'
+                                        onChange={handleChange}
+                                        required
+                                        id='confirmPassword'
+                                    />
+                                    <label className='formLabel' htmlFor='confirmPassword'>Confirm Password</label>
+                                </div>
+                            }
+                            <div className="auth_wrapper_right_form_button">
+                                <p> {isSignIn ? ' Sign In' : ' Sign Up'}</p>
                         </div>
                     </form>
-                    <div className="auth_wrapper_right_footer">
-
-                        <p>Already have an account?</p>
-                        <p>Don\'t have an account? <span>Create Account</span></p>
                     </div>
+                    <div className="auth_wrapper_right_footer">
+                        {isSignIn
+                            ? <p>Don't have an account? <b onClick={() => switchMode("signUp")}>Create Account</b></p>
+                            : <p className='auth_wrapper_right_footer_2ndP' onClick={() => switchMode("signIn")}>Already have an account?</p>
+                        }
+                    </div>
+
 
                 </div>
 
