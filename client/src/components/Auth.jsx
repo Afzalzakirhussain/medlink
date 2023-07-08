@@ -16,10 +16,41 @@ const initialState = {
 const Auth = () => {
     const [isSignIn, setIsSignIn] = useState(true);
     const [formData, setformData] = useState(initialState);
+    const [disableSubmitBtn, setdisableSubmitBtn] = useState(true);
+    const [showPasswordIncorrect, setshowPasswordIncorrect] = useState(false)
 
     const handleChange = (event) => {
-        setformData({ ...formData, [event.target.name]: event.target.value })
-    }
+        setformData((prevFormData) => {
+            const updatedFormData = { ...prevFormData, [event.target.name]: event.target.value };
+            if (isSignIn) {
+                if (updatedFormData.userName.length > 4 && updatedFormData.password.length > 4) {
+                    setdisableSubmitBtn(false);
+                } else {
+                    setdisableSubmitBtn(true);
+                }
+            } else {
+                if (updatedFormData.confirmPassword.length > 3 && updatedFormData.confirmPassword !== updatedFormData.password) {
+                    setshowPasswordIncorrect(true);
+                } else {
+                    setshowPasswordIncorrect(false);
+                }
+                if (
+                    updatedFormData.userName.length > 4 &&
+                    updatedFormData.phoneNumber.length >= 10 &&
+                    updatedFormData.avatharURL.length > 4 &&
+                    updatedFormData.confirmPassword.length > 4 &&
+                    updatedFormData.password.length > 4 &&
+                    (updatedFormData.confirmPassword === updatedFormData.password)
+                ) {
+                    setdisableSubmitBtn(false);
+                } else {
+                    setdisableSubmitBtn(true);
+                }
+            }
+            return updatedFormData;
+        });
+    };
+
 
     const switchMode = (mode) => {
         if (mode === 'signIn') {
@@ -37,7 +68,8 @@ const Auth = () => {
             // const URL = 'http://localhost:5000/auth';
             // https://medlinkbackend.onrender.com
 
-            // fetch datas from db
+            setdisableSubmitBtn(true)
+            // conects and fetch datas from db
             const response = await fetch(`${URL}/${isSignIn ? 'signup' : 'login'}`, requestOptions);
             const data = response.json();
             const { token, userId, fullName, userName, hashedPassword, message } = await data;
@@ -96,6 +128,7 @@ const Auth = () => {
 
         catch (error) {
             console.log(error)
+            setdisableSubmitBtn(false)
             Swal.fire(
                 {
                     title: 'Oops Something went wrong!',
@@ -159,6 +192,7 @@ const Auth = () => {
                                     onChange={handleChange}
                                     required
                                     id='userName'
+                                    value={formData.userName}
                                 />
                                 <label className='formLabel' htmlFor='userName'>User name</label>
                             </div>
@@ -173,6 +207,7 @@ const Auth = () => {
                                             onChange={handleChange}
                                             required
                                             id='phoneNumber'
+                                            value={formData.phoneNumber}
                                         />
                                         <label className='formLabel' htmlFor='phoneNumber'>Phone Number</label>
                                     </div>
@@ -187,6 +222,7 @@ const Auth = () => {
                                             onChange={handleChange}
                                             required
                                             id='avatharUrl'
+                                            value={formData.avatharURL}
                                         />
                                         <label className='formLabel' htmlFor='avatharUrl'>Avathar URL</label>
                                     </div>
@@ -200,10 +236,12 @@ const Auth = () => {
                                     onChange={handleChange}
                                     required
                                     id='password'
+                                    value={formData.password}
                                 />
                                 <label className='formLabel' htmlFor='password'>Password</label>
                             </div>
                             {!isSignIn &&
+                                <>
                                 <div className="auth_wrapper_right_form_input">
                                     <input
                                         type="password"
@@ -213,11 +251,19 @@ const Auth = () => {
                                         onChange={handleChange}
                                         required
                                         id='confirmPassword'
+                                        value={formData.confirmPassword}
                                     />
                                     <label className='formLabel' htmlFor='confirmPassword'>Confirm Password</label>
                                 </div>
+                                <div className="show_password_incorrect">
+                                    {
+                                        showPasswordIncorrect &&
+                                        <p>Passwords not match</p>
+                                    } 
+                                    </div>
+                                </>
                             }
-                            <div className="auth_wrapper_right_form_button">
+                            <div onClick={handleSubmit} className={`auth_wrapper_right_form_button  ${disableSubmitBtn ? 'disable_submit_button' : ''}`}>
                                 <p> {isSignIn ? ' Sign In' : ' Sign Up'}</p>
                         </div>
                     </form>
@@ -228,10 +274,7 @@ const Auth = () => {
                             : <p className='auth_wrapper_right_footer_2ndP' onClick={() => switchMode("signIn")}>Already have an account?</p>
                         }
                     </div>
-
-
                 </div>
-
             </div>
         </>
     )

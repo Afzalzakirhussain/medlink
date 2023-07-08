@@ -2091,3 +2091,14 @@ outline: none !important;
   color: rgba(99, 194, 214, 5);
   background-color: rgba(99, 194, 214, .03);
 }
+.disable_submit_button {
+  cursor: none;
+  pointer-events: none;
+  opacity: .7;
+}
+
+.show_password_incorrect {
+  color: red;
+  font-size: 12px;
+  transform: translateX(-50px);
+}
